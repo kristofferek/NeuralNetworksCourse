@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import scipy as sp
 
 class Hopfield:
 
@@ -52,9 +53,11 @@ def getAvgPError(n, p, avgSize):
 			hop.stepNetwork()
 			nCorrect += hop.getPError()
 			nTotal += n
-
-	print(hop.weights)
+			
 	return nCorrect/nTotal
+
+def getTheoreticalPError(n, p):
+	return (1 - sp.specials.erf(np.sqrt(n/(2*p))))/2
 
 bitsToSee = 100000
 N = 5

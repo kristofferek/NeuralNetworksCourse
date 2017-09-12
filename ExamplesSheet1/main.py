@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import math
 
 class Hopfield:
 
@@ -38,11 +38,30 @@ class Hopfield:
 	def getPError(self):
 		result = np.add(np.divide(self.states, self.initPattern), 1)
 		result = np.divide(result, 2)
-		return np.sum(result)/self.n
+		return np.sum(result)
 
-hop = Hopfield();
-hop.init(1000,137)
-hop.calWeight()
-hop.feedInitPattern(0)
-hop.stepNetwork()
-print(hop.getPError())
+def getAvgPError(n, p, avgSize):
+	hop = Hopfield()
+	nCorrect = 0
+	nTotal = 0
+	for x in range(0,avgSize):
+		hop.init(n,p)
+		hop.calWeight()
+		for _p in range(p):
+			hop.feedInitPattern(_p)
+			hop.stepNetwork()
+			nCorrect += hop.getPError()
+			nTotal += n
+
+	print(hop.weights)
+	return nCorrect/nTotal
+
+bitsToSee = 100000
+N = 5
+P = [1]
+for i in range(1, 20):
+	P.append(i*20)
+for p in P:
+	iterations = math.ceil(bitsToSee / (p*N))
+	print(p)
+	print(getAvgPError(N, p, iterations))

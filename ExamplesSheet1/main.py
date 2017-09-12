@@ -53,19 +53,24 @@ def getAvgPError(n, p, avgSize):
 			nCorrect += hop.getPError()
 			nTotal += n
 			
-	return nCorrect/nTotal
+	return 1- (nCorrect/nTotal)
 
 def getTheoreticalPError(n, p):
 	return (1 - math.erf(np.sqrt(n/(2*p))))/2
 
 bitsToSee = 100000
-N = 1000
+N = 200
 P = [1]
-for i in range(1, 20):
+for i in range(1, 21):
 	P.append(i*20)
+
+x = np.divide(P, N)
+yReal = []
+yTheory = []
 for p in P:
 	iterations = math.ceil(bitsToSee / (p*N))
-	print("P = ",p)
-	print("Theoretical error: ", (1- getTheoreticalPError(N, p)))
-	print("Calaculated error: ", getAvgPError(N, p, iterations))
-	print("n")
+	yReal.append(getAvgPError(N, p, iterations))
+	yTheory.append(getTheoreticalPError(N,p))
+
+plt.plot(x, yReal, 'r-', x, yTheory, 'g-')
+plt.show()

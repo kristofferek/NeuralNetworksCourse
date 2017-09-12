@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-import scipy as sp
 
 class Hopfield:
 
@@ -57,14 +56,16 @@ def getAvgPError(n, p, avgSize):
 	return nCorrect/nTotal
 
 def getTheoreticalPError(n, p):
-	return (1 - sp.specials.erf(np.sqrt(n/(2*p))))/2
+	return (1 - math.erf(np.sqrt(n/(2*p))))/2
 
 bitsToSee = 100000
-N = 5
+N = 1000
 P = [1]
 for i in range(1, 20):
 	P.append(i*20)
 for p in P:
 	iterations = math.ceil(bitsToSee / (p*N))
-	print(p)
-	print(getAvgPError(N, p, iterations))
+	print("P = ",p)
+	print("Theoretical error: ", (1- getTheoreticalPError(N, p)))
+	print("Calaculated error: ", getAvgPError(N, p, iterations))
+	print("n")

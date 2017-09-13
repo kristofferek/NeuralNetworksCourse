@@ -56,7 +56,7 @@ def getAvgPError(n, p, avgSize):
 	return 1- (nCorrect/nTotal)
 
 def getTheoreticalPError(n, p):
-	return (1 - math.erf(np.sqrt(n/(2*p))))/2
+	return (1 - math.erf(np.sqrt(n/(2*p))+np.sqrt(p/(2*n))))/2
 
 bitsToSee = 100000
 N = 200

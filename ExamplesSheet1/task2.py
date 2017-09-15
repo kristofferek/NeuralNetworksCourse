@@ -30,9 +30,9 @@ class AsyncHopfield:
 		self.weights = weights
 
 	def feedInitPattern(self, index):
-		self.initPattern = self.patterns[index]
-		self.states = self.patterns[index]
-		print(np.dot(self.states, np.transpose(self.initPattern)))
+		print(self.patterns[index].shape)
+		self.initPattern = np.copy(self.patterns[index])
+		self.states = np.copy(self.patterns[index])
 
 	def gFunc(self, b):
 		return 1/(1 + math.exp(-2*self.beta* b))
@@ -40,12 +40,12 @@ class AsyncHopfield:
 	def updateRandNeuron(self):
 		i = np.random.randint(0,self.n)
 		bi = np.sum(np.dot(self.weights[i], self.states))
-		
+
 		prob = self.gFunc(bi)
 		rand = np.random.random_sample()
 		newValue = 1 if rand < prob else -1
 
-		self.states[i] = newValue
+		self.states.itemset((i, 0), newValue)
 		self.addMValue()
 
 	def addMValue(self):
@@ -65,12 +65,13 @@ network.init(N, P, 2)
 network.calWeights()
 network.feedInitPattern(0)
 m = []
-for x in range(0,15000):
+for x in range(500000):
 	network.updateRandNeuron()
 	if (x % 100 == 0) and x != 0:
 		mean = network.TravellingM()
 		m.append(mean)
-		print(mean)
+	if x % 1000 == 0 and x != 0:
+		print(m)
 
 plt.plot(m)
 plt.show()

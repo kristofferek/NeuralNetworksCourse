@@ -30,7 +30,6 @@ class AsyncHopfield:
 		self.weights = weights
 
 	def feedInitPattern(self, index):
-		print(self.patterns[index].shape)
 		self.initPattern = np.copy(self.patterns[index])
 		self.states = np.copy(self.patterns[index])
 
@@ -39,7 +38,7 @@ class AsyncHopfield:
 
 	def updateRandNeuron(self):
 		i = np.random.randint(0,self.n)
-		bi = np.sum(np.dot(self.weights[i], self.states))
+		bi = np.dot(self.weights[i], self.states)[0]
 
 		prob = self.gFunc(bi)
 		rand = np.random.random_sample()
@@ -49,7 +48,8 @@ class AsyncHopfield:
 		self.addMValue()
 
 	def addMValue(self):
-		self.m += (1/self.n)*(np.sum(np.dot(self.states, np.transpose(self.initPattern))))
+		nCorrect = np.dot(np.transpose(self.states), self.initPattern)[0][0]
+		self.m += (1/self.n)*(nCorrect)
 		self.time += 1
 
 	def TravellingM(self):
@@ -60,18 +60,24 @@ class AsyncHopfield:
 N= 200
 P = 5
 
-network = AsyncHopfield()
-network.init(N, P, 2)
-network.calWeights()
-network.feedInitPattern(0)
-m = []
-for x in range(500000):
-	network.updateRandNeuron()
-	if (x % 100 == 0) and x != 0:
-		mean = network.TravellingM()
-		m.append(mean)
-	if x % 1000 == 0 and x != 0:
-		print(m)
+mCollection = [] 
 
-plt.plot(m)
+for i in range(0,20):
+	print(i)
+	network = AsyncHopfield()
+	network.init(N, P, 2)
+	network.calWeights()
+	network.feedInitPattern(0)
+	m = [1]
+	for x in range(500000):
+		network.updateRandNeuron()
+		if (x % 100 == 0) and x != 0:
+			mean = network.TravellingM()
+			m.append(mean)
+	mCollection.append(m)
+
+for m in mCollection:
+	plt.plot(m)
+
+plt.ylim(0,1)
 plt.show()

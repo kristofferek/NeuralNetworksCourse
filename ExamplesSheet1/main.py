@@ -1,3 +1,4 @@
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -19,9 +20,9 @@ class Hopfield:
 	def calWeight(self):
 		weights = np.zeros((self.n, self.n))
 		for x in range(0,self.p):
-			w = (self.patterns[x] * np.transpose(self.patterns[x]))/self.n
+			w = (self.patterns[x] * np.transpose(self.patterns[x]))
 			weights = np.add(weights, w)
-		self.weights = weights
+		self.weights = weights/self.n
 
 	def feedInitPattern(self, index):
 		self.initPattern = self.patterns[index]
@@ -40,11 +41,11 @@ class Hopfield:
 		result = np.divide(result, 2)
 		return np.sum(result)
 
-def getAvgPError(n, p, avgSize):
+def getAvgPError(n, p, iterations):
 	hop = Hopfield()
 	nCorrect = 0
 	nTotal = 0
-	for x in range(0,avgSize):
+	for x in range(0,iterations):
 		hop.init(n,p)
 		hop.calWeight()
 		for _p in range(p):
@@ -52,11 +53,11 @@ def getAvgPError(n, p, avgSize):
 			hop.stepNetwork()
 			nCorrect += hop.getPError()
 			nTotal += n
-			
+	
 	return 1- (nCorrect/nTotal)
 
 def getTheoreticalPError(n, p):
-	return (1 - math.erf(np.sqrt(n/(2*p))+np.sqrt(p/(2*n))))/2
+	return (1 - math.erf(np.sqrt(n/(2*p)) + np.sqrt(p/(2*n))))/2
 
 bitsToSee = 100000
 N = 200
@@ -69,8 +70,23 @@ yReal = []
 yTheory = []
 for p in P:
 	iterations = math.ceil(bitsToSee / (p*N))
-	yReal.append(getAvgPError(N, p, iterations))
-	yTheory.append(getTheoreticalPError(N,p))
+	realPerror = getAvgPError(N, p, iterations)
+	theoryPerror = getTheoreticalPError(N,p)
+	print(p)
+	print('Real: ', realPerror)
+	print('Theory: ',  theoryPerror)
+	print('\n')
+	yReal.append(realPerror)
+	yTheory.append(theoryPerror)
 
+print('Calculations done')
 plt.plot(x, yReal, 'r-', x, yTheory, 'g-')
+red_patch = mpatches.Patch(color='red', label='Real data')
+legend1 = plt.legend(handles=[red_patch], loc=1)
+plt.gca().add_artist(legend1)
+green = mpatches.Patch(color='green', label='Theoretical data')
+plt.legend(handles=[green], loc=2)
+plt.xlabel('p/N')
+plt.ylabel('Perror')
+
 plt.show()

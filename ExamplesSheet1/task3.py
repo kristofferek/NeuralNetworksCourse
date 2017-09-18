@@ -67,15 +67,33 @@ class Backpropagation:
 		self.weights = np.add(self.weights, self.learnR * np.dot(l0, l1Delta))
 		self.threshold = np.add(self.threshold, -(self.learnR * l1Delta))
 
+	def energyShit(self):
+		sum = 0
+		for x in range(0, len(self.inputData)):
+			# Forward propagation
+			l0 = np.zeros((2,1))
+			y = 0
+			for z in self.inputData[x]:
+				l0.itemset((y,0),z)
+				y+=1
+
+			b = np.dot(np.transpose(self.weights), l0) - self.threshold
+			output = self.actFunc(b)
+			sum += (self.targetOutput[x] - output)**2
+		return sum/2
+
 learnR = 0.02
 beta = 0.5
 
-
+shitPlot = []
 back = Backpropagation()
 back.readData()
 back.initValues(learnR, beta)
-for x in range(1,1000000):
+for x in range(1,100000):
 	back.trainNetwork()
-	if x % 100000 == 0:
+	shitPlot.append(back.energyShit())
+	if x % 10000 == 0:
 		print(x)
 back.trainNetwork(True)
+plt.plot(shitPlot)
+plt.show()

@@ -25,8 +25,8 @@ class Hopfield:
 		self.weights = weights/self.n
 
 	def feedInitPattern(self, index):
-		self.initPattern = self.patterns[index]
-		self.states = self.patterns[index]
+		self.initPattern = np.copy(self.patterns[index])
+		self.states = np.copy(self.patterns[index])
 
 	def stepNetwork(self):
 		sign = lambda x: -1 if x < 0 else 1
@@ -53,7 +53,7 @@ def getAvgPError(n, p, iterations):
 			hop.stepNetwork()
 			nCorrect += hop.getPError()
 			nTotal += n
-	
+	print(hop.weights)
 	return 1- (nCorrect/nTotal)
 
 def getTheoreticalPError(n, p):
@@ -62,8 +62,6 @@ def getTheoreticalPError(n, p):
 bitsToSee = 100000
 N = 200
 P = [1]
-for i in range(1, 21):
-	P.append(i*20)
 
 x = np.divide(P, N)
 yReal = []

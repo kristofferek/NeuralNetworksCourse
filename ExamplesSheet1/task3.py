@@ -2,6 +2,8 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from random import randint
+
 
 class Backpropagation:
 	def readData(self):
@@ -15,6 +17,7 @@ class Backpropagation:
 					if counter < 2:
 						temp.append(float(word))
 					else:
+						temp = np.asarray(temp).T
 						self.inputData.append(temp)
 						self.targetOutput.append(float(word))
 					counter += 1
@@ -25,25 +28,34 @@ class Backpropagation:
 	def initValues(self, learnR, beta):
 		self.learnR = learnR
 		self.beta = beta
-		np.random.seed(1)
 		self.weights = (0.2 - (-0.2)) * np.random.random_sample((2,1)) + (-0.2)
-		self.thresholds = (1 - (-1)) * np.random.random_sample((2,1)) + (-1)
+		self.threshold = (1 - (-1)) * np.random.random_sample() + (-1)
+		print(self.weights)
+
 
 	def actFunc(self, b, deriv=False):
 		if (deriv == True):
 			return self.beta*(1-np.tanh(self.beta*b)**2)
 		return np.tanh(self.beta*b)
 
-	def trainNetwork(self):
-		rand = np.random.randint(0,len(self.inputData))
+	def trainNetwork(self, test=False):
+		if test == True:
+			rand = 1
+		else:
+			rand = randint(0,len(self.inputData)-1)
 		# Forward propagation
 		l0 = np.zeros((2,1))
+		y = 0
 		for x in self.inputData[rand]:
-			y = 0
 			l0.itemset((y,0),x)
 			y+=1
-		l1 = self.actFunc(np.dot(np.transpose(self.weights), l0))
-		print(l1)
+
+		b = np.dot(np.transpose(self.weights), l0) - self.threshold
+		l1 = self.actFunc(b)
+
+		if test == True:
+			print(l0)
+			print(l1)
 
 		#Backwards propagation
 		# Error
@@ -52,8 +64,9 @@ class Backpropagation:
 		# Delta error
 		l1Delta = l1Error * self.actFunc(l1, True)
 
-		self.weights += self.learnR * np.dot(l0, l1Delta)
-		print(self.weights)
+		self.weights = np.add(self.weights, self.learnR * np.dot(l0, l1Delta))
+		self.threshold = np.add(self.threshold, -(self.learnR * l1Delta))
+
 learnR = 0.02
 beta = 0.5
 
@@ -61,4 +74,8 @@ beta = 0.5
 back = Backpropagation()
 back.readData()
 back.initValues(learnR, beta)
-back.trainNetwork()
+for x in range(1,1000000):
+	back.trainNetwork()
+	if x % 100000 == 0:
+		print(x)
+back.trainNetwork(True)

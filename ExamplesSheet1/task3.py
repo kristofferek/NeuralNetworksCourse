@@ -28,7 +28,11 @@ class Backpropagation:
 	def initValues(self, learnR, beta):
 		self.learnR = learnR
 		self.beta = beta
+
+		# 2x1 matrix, random values [-0.2, 0.2]
 		self.weights = (0.2 - (-0.2)) * np.random.random_sample((2,1)) + (-0.2)
+
+		# single random value [-1, 1]
 		self.threshold = (1 - (-1)) * np.random.random_sample() + (-1)
 
 
@@ -59,6 +63,8 @@ class Backpropagation:
 
 		# Delta error
 		l1Delta = l1Error * self.actFunc(l1, True)
+
+		#Updates
 		self.weights = np.add(self.weights, self.learnR * np.dot(l0, l1Delta))
 		self.threshold = np.add(self.threshold, -(self.learnR * l1Delta))
 

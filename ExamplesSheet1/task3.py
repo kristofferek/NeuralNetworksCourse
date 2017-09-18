@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 from random import randint
-
+import time
 
 class Backpropagation:
 	def readData(self):
@@ -46,6 +46,7 @@ class Backpropagation:
 		l0 = (self.inputData[rand])[np.newaxis].T
 
 		b = np.dot(np.transpose(self.weights), l0) - self.threshold
+		
 		l1 = self.actFunc(b)
 
 		if test == True:
@@ -70,6 +71,8 @@ class Backpropagation:
 		sum = np.sum(np.power((self.targetOutput - output), 2))
 		return sum/2
 
+
+
 learnR = 0.02
 beta = 0.5
 
@@ -77,11 +80,16 @@ shitPlot = []
 back = Backpropagation()
 back.readData()
 back.initValues(learnR, beta)
+start = time.time()
 for x in range(1,100000):
 	back.trainNetwork()
+
 	shitPlot.append(back.energyFunc())
+
 	if x % 10000 == 0:
 		print(x)
+		end = time.time()
+		print(end - start, ' seconds since begining')
 back.trainNetwork(True)
 plt.plot(shitPlot)
 plt.show()

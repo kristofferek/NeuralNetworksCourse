@@ -13,18 +13,20 @@ class Backpropagation:
 				temp = []
 				for word in line.split():
 					if counter < 2:
-						temp.append(word)
+						temp.append(float(word))
 					else:
 						self.inputData.append(temp)
-						self.targetOutput.append(word)
+						self.targetOutput.append(float(word))
 					counter += 1
+		np.asarray(self.inputData)
+		np.asarray(self.targetOutput)
+
 
 	def initValues(self, learnR, beta):
 		self.learnR = learnR
-		self.beta = beta 
+		self.beta = beta
 		np.random.seed(1)
 		self.weights = (0.2 - (-0.2)) * np.random.random_sample((2,1)) + (-0.2)
-		self.weights = map(float, self.weights)
 		self.thresholds = (1 - (-1)) * np.random.random_sample((2,1)) + (-1)
 
 	def actFunc(self, b, deriv=False):
@@ -35,9 +37,13 @@ class Backpropagation:
 	def trainNetwork(self):
 		rand = np.random.randint(0,len(self.inputData))
 		# Forward propagation
-		l0 = self.inputData[rand]
-		l0 = map(float, l0)
-		l1 = self.actFunc(np.dot(self.weights, l0))
+		l0 = np.zeros((2,1))
+		for x in self.inputData[rand]:
+			y = 0
+			l0.itemset((y,0),x)
+			y+=1
+		l1 = self.actFunc(np.dot(np.transpose(self.weights), l0))
+		print(l1)
 
 		#Backwards propagation
 		# Error
@@ -46,8 +52,8 @@ class Backpropagation:
 		# Delta error
 		l1Delta = l1Error * self.actFunc(l1, True)
 
-		self.weights += self.learnR * np.dot(l0.T, l1Delta)
-
+		self.weights += self.learnR * np.dot(l0, l1Delta)
+		print(self.weights)
 learnR = 0.02
 beta = 0.5
 

@@ -38,7 +38,7 @@ class Backpropagation:
 
 	def actFunc(self, b, deriv=False):
 		if (deriv == True):
-			return self.beta*(1-np.tanh(self.beta*b)**2)
+			return self.beta*(1-np.square(np.tanh(self.beta*b)))
 		return np.tanh(self.beta*b)
 
 	def trainNetwork(self, test=False):

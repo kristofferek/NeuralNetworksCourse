@@ -86,25 +86,58 @@ class Backpropagation:
 		sum = np.sum(np.square(target[np.newaxis].T - output))
 		return sum/2
 
+	def classError(self, input, target):
+		b = np.dot(input, self.weights) - self.threshold
+		output = self.actFunc(b)
+		sum = np.sum(np.absolute(target[np.newaxis].T - np.sign(output)))
+		return sum * (1/(2*len(input)))
+
+
 learnR = 0.02
 beta = 0.5
 
+C_T = []
+C_V = []
 trainingEnergy = []
 validationEnergy = []
-back = Backpropagation()
-back.readData()
-back.initValues(learnR, beta)
-start = time.time()
-for x in range(1,100000):
-	back.trainNetwork()
-	trainingEnergy.append(back.energyFunc(back.inputData, back.targetOutput))
-	validationEnergy.append(back.energyFunc(back.V_inputData, back.V_targetOutput))
-	if x % 10000 == 0:
-		print(x)
-		end = time.time()
-		print(end - start, ' seconds since begining')
+for x in range(0,10):
+	t = []
+	v = []
+	back = Backpropagation()
+	back.readData()
+	back.initValues(learnR, beta)
+	start = time.time()
+	for i in range(1,1000000):
+		back.trainNetwork()
+		t.append(back.energyFunc(back.inputData, back.targetOutput))
+		v.append(back.energyFunc(back.V_inputData, back.V_targetOutput))
+	
+	print('Experiment: ', x+1)
+	trainingEnergy.append(t)
+	validationEnergy.append(v)
+
+	# Training classification error
+	cErr = back.classError(back.inputData, back.targetOutput)
+	C_T.append(cErr)
+
+	# Validation classification error
+	cErr = back.classError(back.V_inputData, back.V_targetOutput)
+	C_V.append(cErr)
+
+np.array(C_T)
+np.array(C_V)
+print('Training Avg: ', np.average(C_T))
+print('Training Mini: ', np.amin(C_T))
+print('Training Var: ', np.var(C_T))
+
+print('Validation Avg: ', np.average(C_V))
+print('Validation Mini: ', np.amin(C_V))
+print('Validation Var: ', np.var(C_V))
+
 plt.subplot(2, 1, 1)
-plt.plot(trainingEnergy)
+for x in trainingEnergy:
+	plt.plot(x)
 plt.subplot(2, 1, 2)
-plt.plot(validationEnergy, 'r-')
+for x in validationEnergy:
+	plt.plot(x)
 plt.show()

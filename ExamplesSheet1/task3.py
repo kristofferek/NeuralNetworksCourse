@@ -38,24 +38,17 @@ class Backpropagation:
 
 	def actFunc(self, b, deriv=False):
 		if (deriv == True):
-			return self.beta*(1-np.square(np.tanh(self.beta*b)))
+			return self.beta*(1-np.tanh(self.beta*b)**2)
 		return np.tanh(self.beta*b)
 
-	def trainNetwork(self, test=False):
-		if test == True:
-			rand = 1
-		else:
-			rand = randint(0,len(self.inputData)-1)
+	def trainNetwork(self):
+		rand = randint(0,len(self.inputData)-1)
 		# Forward propagation
 		l0 = (self.inputData[rand])[np.newaxis].T
 
 		b = np.dot(np.transpose(self.weights), l0) - self.threshold
 
 		l1 = self.actFunc(b)
-
-		if test == True:
-			print(l0)
-			print(l1)
 
 		#Backwards propagation
 		# Error
@@ -72,7 +65,7 @@ class Backpropagation:
 		# Forward propagation
 		b = np.dot(self.inputData, self.weights) - self.threshold
 		output = self.actFunc(b)
-		sum = np.sum(np.square(self.targetOutput - output))
+		sum = np.sum(np.square(self.targetOutput[np.newaxis].T - output))
 		return sum/2
 
 learnR = 0.02
@@ -83,15 +76,13 @@ back = Backpropagation()
 back.readData()
 back.initValues(learnR, beta)
 start = time.time()
-for x in range(1,100000):
+for x in range(1,1000000):
 	back.trainNetwork()
 	shitPlot.append(back.energyFunc())
 
-	if x % 10000 == 0:
+	if x % 100000 == 0:
 		print(x)
 		end = time.time()
 		print(end - start, ' seconds since begining')
-
-back.trainNetwork(True)
 plt.plot(shitPlot)
 plt.show()

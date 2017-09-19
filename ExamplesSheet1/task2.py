@@ -58,7 +58,7 @@ class AsyncHopfield:
 
 
 N= 200
-P = 5
+P = 40
 
 mCollection = [] 
 
@@ -69,7 +69,7 @@ for i in range(0,20):
 	network.calWeights()
 	network.feedInitPattern(0)
 	m = [1]
-	for x in range(500000):
+	for x in range(1000000):
 		network.updateRandNeuron()
 		if (x % 100 == 0) and x != 0:
 			mean = network.TravellingM()
@@ -79,8 +79,7 @@ for i in range(0,20):
 for m in mCollection:
 	plt.plot(m)
 
-plt.title('Ordo parameter for pattern 1 as a function of time')
-plt.xlabel('t,  (1 t = 100 updates)')
+plt.title('Ordo parameter for pattern 1 as a function of time (p=40)')
+plt.xlabel('t,  (t = 100 updates)')
 plt.ylabel('m')
-plt.ylim(0,1)
 plt.show()

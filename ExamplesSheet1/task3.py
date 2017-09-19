@@ -24,6 +24,24 @@ class Backpropagation:
 		self.inputData = np.asarray(self.inputData)
 		self.targetOutput = np.asarray(self.targetOutput)
 
+		# Validation data
+		self.V_inputData = []
+		self.V_targetOutput = []
+		with open('valid_data.txt','r') as f:
+			for line in f:
+				counter = 0
+				temp = []
+				for word in line.split():
+					if counter < 2:
+						temp.append(float(word))
+					else:
+						temp = np.asarray(temp)
+						self.V_inputData.append(temp)
+						self.V_targetOutput.append(float(word))
+					counter += 1
+		self.V_inputData = np.asarray(self.V_inputData)
+		self.V_targetOutput = np.asarray(self.V_targetOutput)
+
 
 	def initValues(self, learnR, beta):
 		self.learnR = learnR
@@ -76,11 +94,11 @@ back = Backpropagation()
 back.readData()
 back.initValues(learnR, beta)
 start = time.time()
-for x in range(1,1000000):
+for x in range(1,100000):
 	back.trainNetwork()
 	shitPlot.append(back.energyFunc())
 
-	if x % 100000 == 0:
+	if x % 10000 == 0:
 		print(x)
 		end = time.time()
 		print(end - start, ' seconds since begining')

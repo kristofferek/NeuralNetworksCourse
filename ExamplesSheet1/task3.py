@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 from random import randint
-import time
 
 class Backpropagation:
 	def readData(self):
@@ -95,24 +94,26 @@ class Backpropagation:
 
 learnR = 0.02
 beta = 0.5
-
 C_T = []
 C_V = []
 trainingEnergy = []
 validationEnergy = []
-for x in range(0,10):
+
+# Experiments
+for experiment in range(0,10):
 	t = []
 	v = []
 	back = Backpropagation()
 	back.readData()
 	back.initValues(learnR, beta)
-	start = time.time()
-	for i in range(1,1000000):
+
+	# Learning iterations
+	for i in range(1,100000):
 		back.trainNetwork()
 		t.append(back.energyFunc(back.inputData, back.targetOutput))
 		v.append(back.energyFunc(back.V_inputData, back.V_targetOutput))
 	
-	print('Experiment: ', x+1)
+	print('Experiment: ', experiment+1)
 	trainingEnergy.append(t)
 	validationEnergy.append(v)
 
@@ -124,6 +125,7 @@ for x in range(0,10):
 	cErr = back.classError(back.V_inputData, back.V_targetOutput)
 	C_V.append(cErr)
 
+# Classification error prints
 np.array(C_T)
 np.array(C_V)
 print('Training Avg: ', np.average(C_T))
@@ -134,10 +136,19 @@ print('Validation Avg: ', np.average(C_V))
 print('Validation Mini: ', np.amin(C_V))
 print('Validation Var: ', np.var(C_V))
 
-plt.subplot(2, 1, 1)
-for x in trainingEnergy:
-	plt.plot(x)
-plt.subplot(2, 1, 2)
-for x in validationEnergy:
-	plt.plot(x)
+# Plotting
+f, axarr = plt.subplots(2, sharex=True)
+for t in trainingEnergy:
+	axarr[0].plot(t)
+axarr[0].set_title('Training set')
+axarr[0].set_xlabel('Iterations')
+axarr[0].set_ylabel('H')
+for v in validationEnergy:
+	axarr[1].plot(v)
+axarr[1].set_title('Validation set')
+axarr[1].set_xlabel('Iterations')
+axarr[1].set_ylabel('H')
+
+
+f.subplots_adjust(hspace=0.3)
 plt.show()

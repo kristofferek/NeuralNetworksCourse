@@ -79,5 +79,8 @@ for i in range(0,20):
 for m in mCollection:
 	plt.plot(m)
 
+plt.title('Ordo parameter for pattern 1 as a function of time')
+plt.xlabel('t,  (1 t = 100 updates)')
+plt.ylabel('m')
 plt.ylim(0,1)
 plt.show()

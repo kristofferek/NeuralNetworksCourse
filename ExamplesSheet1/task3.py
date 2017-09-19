@@ -17,7 +17,7 @@ class Backpropagation:
 					if counter < 2:
 						temp.append(float(word))
 					else:
-						temp = np.asarray(temp)[np.newaxis]
+						temp = np.asarray(temp)
 						self.inputData.append(temp)
 						self.targetOutput.append(float(word))
 					counter += 1
@@ -47,7 +47,7 @@ class Backpropagation:
 		else:
 			rand = randint(0,len(self.inputData)-1)
 		# Forward propagation
-		l0 = (self.inputData[rand]).T
+		l0 = (self.inputData[rand])[np.newaxis].T
 
 		b = np.dot(np.transpose(self.weights), l0) - self.threshold
 

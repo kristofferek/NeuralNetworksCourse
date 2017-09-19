@@ -50,7 +50,7 @@ class Backpropagation:
 		l0 = (self.inputData[rand])[np.newaxis].T
 
 		b = np.dot(np.transpose(self.weights), l0) - self.threshold
-		
+
 		l1 = self.actFunc(b)
 
 		if test == True:
@@ -63,10 +63,10 @@ class Backpropagation:
 
 		# Delta error
 		l1Delta = l1Error * self.actFunc(l1, True)
-
+		l1Delta = self.learnR * l1Delta
 		#Updates
-		self.weights = np.add(self.weights, self.learnR * np.dot(l0, l1Delta))
-		self.threshold = np.add(self.threshold, -(self.learnR * l1Delta))
+		self.weights = np.add(self.weights, np.dot(l0, l1Delta))
+		self.threshold = np.add(self.threshold, -l1Delta)
 
 	def energyFunc(self):
 		# Forward propagation
@@ -74,10 +74,8 @@ class Backpropagation:
 
 		output = self.actFunc(b)
 
-		sum = np.sum(np.power((self.targetOutput - output), 2))
+		sum = np.sum(np.square(self.targetOutput - output))
 		return sum/2
-
-
 
 learnR = 0.02
 beta = 0.5
@@ -89,13 +87,13 @@ back.initValues(learnR, beta)
 start = time.time()
 for x in range(1,100000):
 	back.trainNetwork()
-
 	shitPlot.append(back.energyFunc())
 
 	if x % 10000 == 0:
 		print(x)
 		end = time.time()
 		print(end - start, ' seconds since begining')
+
 back.trainNetwork(True)
 plt.plot(shitPlot)
 plt.show()

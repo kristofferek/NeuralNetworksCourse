@@ -17,7 +17,7 @@ class Backpropagation:
 					if counter < 2:
 						temp.append(float(word))
 					else:
-						temp = np.asarray(temp)
+						temp = np.asarray(temp)[np.newaxis]
 						self.inputData.append(temp)
 						self.targetOutput.append(float(word))
 					counter += 1
@@ -47,7 +47,7 @@ class Backpropagation:
 		else:
 			rand = randint(0,len(self.inputData)-1)
 		# Forward propagation
-		l0 = (self.inputData[rand])[np.newaxis].T
+		l0 = (self.inputData[rand]).T
 
 		b = np.dot(np.transpose(self.weights), l0) - self.threshold
 
@@ -71,9 +71,7 @@ class Backpropagation:
 	def energyFunc(self):
 		# Forward propagation
 		b = np.dot(self.inputData, self.weights) - self.threshold
-
 		output = self.actFunc(b)
-
 		sum = np.sum(np.square(self.targetOutput - output))
 		return sum/2
 

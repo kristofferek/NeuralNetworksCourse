@@ -66,6 +66,7 @@ for i in range(0,20):
 	print(i)
 	network = AsyncHopfield()
 	network.init(N, P, 2)
+
 	network.calWeights()
 	network.feedInitPattern(0)
 	m = [1]
@@ -79,7 +80,7 @@ for i in range(0,20):
 for m in mCollection:
 	plt.plot(m)
 
-plt.title('Ordo parameter for pattern 1 as a function of time (p=40)')
-plt.xlabel('t,  (t = 100 updates)')
-plt.ylabel('m')
+plt.title('Order parameter for pattern 1 as a function of time (p=40)')
+plt.xlabel('T,  (T = 100 updates)')
+plt.ylabel('<m1>')
 plt.show()

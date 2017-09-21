@@ -101,7 +101,7 @@ trainingEnergy = []
 validationEnergy = []
 
 # Experiments
-for experiment in range(0,1):
+for experiment in range(0,10):
 	t = []
 	v = []
 	back = Backpropagation()

@@ -54,6 +54,13 @@ for i in range(0,300):
 	else:
 		negX.append(data.inputData[i][np.newaxis][0, 0])
 		negY.append(data.inputData[i][np.newaxis][0, 1])
+for i in range(0,200):
+	if data.V_targetOutput[i] == 1:
+		posX.append(data.V_inputData[i][np.newaxis][0, 0])
+		posY.append(data.V_inputData[i][np.newaxis][0, 1])
+	else:
+		negX.append(data.V_inputData[i][np.newaxis][0, 0])
+		negY.append(data.V_inputData[i][np.newaxis][0, 1])
 
 plt.plot(posX,posY, '.')
 plt.plot(negX,negY, '.')

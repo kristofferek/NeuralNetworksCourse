@@ -72,7 +72,7 @@ class Backpropagation:
 		l1Error = self.targetOutput[rand] - l1
 
 		# Delta error
-		l1Delta = l1Error * self.actFunc(l1, True)
+		l1Delta = l1Error * self.actFunc(b, True)
 		l1Delta = self.learnR * l1Delta
 		#Updates
 		self.weights = np.add(self.weights, np.dot(l0, l1Delta))
@@ -94,13 +94,14 @@ class Backpropagation:
 
 learnR = 0.02
 beta = 0.5
+
 C_T = []
 C_V = []
 trainingEnergy = []
 validationEnergy = []
 
 # Experiments
-for experiment in range(0,10):
+for experiment in range(0,1):
 	t = []
 	v = []
 	back = Backpropagation()
@@ -108,7 +109,7 @@ for experiment in range(0,10):
 	back.initValues(learnR, beta)
 
 	# Learning iterations
-	for i in range(1,100000):
+	for i in range(1,1000000):
 		back.trainNetwork()
 		t.append(back.energyFunc(back.inputData, back.targetOutput))
 		v.append(back.energyFunc(back.V_inputData, back.V_targetOutput))

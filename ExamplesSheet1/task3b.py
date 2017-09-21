@@ -22,7 +22,6 @@ class Backpropagation:
                         self.targetOutput.append(float(word))
                     counter += 1
         self.inputData = np.asarray(self.inputData)
-        #print('inputData ',self.inputData.shape)
         self.targetOutput = np.asarray(self.targetOutput)
 
         # Validation data
@@ -41,23 +40,18 @@ class Backpropagation:
                         self.V_targetOutput.append(float(word))
                     counter += 1
         self.V_inputData = np.asarray(self.V_inputData)
-        #print('V_inputData ', self.V_inputData.shape)
         self.V_targetOutput = np.asarray(self.V_targetOutput)
 
     def initValues(self, learnR, beta):
         self.learnR = learnR
         self.beta = beta
 
-        # 2x1 matrix, random values [-0.2, 0.2]
-        self.smallWeights = (0.2 - (-0.2)) * np.random.random_sample((2,4)) + (-0.2)
-        #print('smallWeights ', self.smallWeights.shape)
-
-        self.bigWeights =  (0.2 - (-0.2)) * np.random.random_sample((4,1)) + (-0.2)
-        # single random value [-1, 1]
+        # Weights
+        self.wj = (0.2 - (-0.2)) * np.random.random_sample((2,4)) + (-0.2)
+        self.wi =  (0.2 - (-0.2)) * np.random.random_sample((4,1)) + (-0.2)
+        # Thresholds
         self.outputTS = (1 - (-1)) * np.random.random_sample() + (-1)
-
-        self.hiddenTS = (1 - (-1)) * np.random.random_sample((1,4)) + (-1)
-        #print('hiddenTS ',self.hiddenTS.shape)
+        self.hiddenTS = (1 - (-1)) * np.random.random_sample((4,1)) + (-1)
 
     def actFunc(self, b, deriv=False):
         if (deriv == True):
@@ -65,80 +59,109 @@ class Backpropagation:
         return np.tanh(self.beta*b)
 
     def trainNetwork(self):
-        #
-        #HIDDEN
-        #
         rand = randint(0,len(self.inputData)-1)
-
         # Forward propagation
         inputs = (self.inputData[rand])[np.newaxis].T
-        bj = np.sum(np.dot(np.transpose(self.smallWeights),inputs)) - self.hiddenTS
-        #print('bj',bj.shape)
-        hidden = self.actFunc(bj)
-        #print('V ',hidden.shape)
+        bj = np.dot(np.transpose(self.wj),inputs) - self.hiddenTS
+        V = self.actFunc(bj)
 
-        bi = np.sum(np.dot(hidden,self.bigWeights)) - self.outputTS
-        #print('bi', bi.shape)
+        bi = np.dot(np.transpose(V), self.wi) - self.outputTS
         output = self.actFunc(bi)
-        #print('output ', output.shape)
-
 
         #Backwards propagation
-        # Output Error
         outputError = self.targetOutput[rand] - output
-        #print('outputError ', outputError.shape)
+        di = outputError * self.actFunc(bi, True)
 
-        # Delta output
-        outputDelta = outputError * self.actFunc(output, True)
-        outputDelta = self.learnR * outputDelta
-        #print('outputDelta ',outputDelta.shape)
-
-        # Hidden Error
-        hiddenError = np.dot(outputDelta,np.transpose(self.bigWeights))
-        #print('hiddenError ', hiddenError.shape)
-
-        # Delta Hidden
-        hiddenDelta = hiddenError * self.actFunc(hidden,True)
-        hiddenDelta = self.learnR * hiddenDelta
-        #print('hiddenDelta ', hiddenDelta)
+        VError = np.dot(di,np.transpose(self.wi))
+        dj = np.transpose(VError) * self.actFunc(bj,True)
 
         #Updates
-        self.bigWeights = np.add(self.bigWeights,np.dot(np.transpose(hidden), outputDelta))
-        self.outputTS = np.add(self.outputTS, -outputDelta)
-        self.smallWeights = np.add(self.smallWeights,np.dot(inputs, hiddenDelta))
-        self.hiddenTS = np.add(self.hiddenTS, -hiddenDelta)
-        #print('outputTs ', self.outputTS.shape)
-        #print('hiddenTs ', self.hiddenTS.shape)
+        self.wi = np.add(self.wi, np.dot(V, self.learnR*di))
+        self.outputTS = np.add(self.outputTS, -(self.learnR*di))
+        self.wj = np.add(self.wj, np.dot(inputs, self.learnR*np.transpose(dj)))
+        self.hiddenTS = np.add(self.hiddenTS, -(self.learnR*dj))
+
+    def getOutputForAllP(self, input, target):
+        # Forward propagation
+        bj = np.dot(input, self.wj) - np.transpose(self.hiddenTS)
+        v = self.actFunc(bj)
+
+        bi = np.dot(v, self.wi) - self.outputTS
+        return self.actFunc(bi)
+
 
     def energyFunc(self, input, target):
-        # Forward propagation
-        bj = np.dot(input, self.smallWeights) - self.hiddenTS
-        v = self.actFunc(bj)
-        bi = np.dot(v, self.bigWeights) - self.outputTS
-        output = self.actFunc(bi)
-        #print('bigOutput ', output.shape)
+        output = self.getOutputForAllP(input, target)
+
         sum = np.sum(np.square(target[np.newaxis].T - output))
         return sum/2
+
+    def classError(self, input, target):
+        output = self.getOutputForAllP(input, target)
+
+        sum = np.sum(np.absolute(target[np.newaxis].T - np.sign(output)))
+        return sum * (1/(2*len(input)))
 
 learnR = 0.02
 beta = 0.5
 
+C_T = []
+C_V = []
 trainingEnergy = []
 validationEnergy = []
-back = Backpropagation()
-back.readData()
-back.initValues(learnR, beta)
-start = time.time()
-for x in range(1,100000):
-	back.trainNetwork()
-	trainingEnergy.append(back.energyFunc(back.inputData, back.targetOutput))
-	validationEnergy.append(back.energyFunc(back.V_inputData, back.V_targetOutput))
-	if x % 10000 == 0:
-		print(x)
-		end = time.time()
-		print(end - start, ' seconds since begining')
-plt.subplot(2, 1, 1)
-plt.plot(trainingEnergy)
-plt.subplot(2, 1, 2)
-plt.plot(validationEnergy, 'r-')
+
+# Experiments
+for experiment in range(0,10):
+    t = []
+    v = []
+    net = Backpropagation()
+    net.readData()
+    net.initValues(learnR, beta)
+
+    # Learning iterations
+    for i in range(1,1000000):
+        net.trainNetwork()
+        t.append(net.energyFunc(net.inputData, net.targetOutput))
+        v.append(net.energyFunc(net.V_inputData, net.V_targetOutput))
+        if i % 100000 == 0:
+            print(i)
+    
+    print('Experiment: ', experiment+1)
+    trainingEnergy.append(t)
+    validationEnergy.append(v)
+
+    # Training classification error
+    cErr = net.classError(net.inputData, net.targetOutput)
+    C_T.append(cErr)
+
+    # Validation classification error
+    cErr = net.classError(net.V_inputData, net.V_targetOutput)
+    C_V.append(cErr)
+
+# Classification error prints
+np.array(C_T)
+np.array(C_V)
+print('Training Avg: ', np.average(C_T))
+print('Training Mini: ', np.amin(C_T))
+print('Training Var: ', np.var(C_T))
+
+print('Validation Avg: ', np.average(C_V))
+print('Validation Mini: ', np.amin(C_V))
+print('Validation Var: ', np.var(C_V))
+
+# Plotting
+f, axarr = plt.subplots(2, sharex=True)
+for t in trainingEnergy:
+    axarr[0].plot(t)
+axarr[0].set_title('Training set')
+axarr[0].set_xlabel('Iterations')
+axarr[0].set_ylabel('H')
+for v in validationEnergy:
+    axarr[1].plot(v)
+axarr[1].set_title('Validation set')
+axarr[1].set_xlabel('Iterations')
+axarr[1].set_ylabel('H')
+
+
+f.subplots_adjust(hspace=0.3)
 plt.show()
